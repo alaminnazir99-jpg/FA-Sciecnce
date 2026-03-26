@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -27,6 +28,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE
+        )
+
         setContent {
             WebsiteScreen("https://sites.google.com/view/fa-science/home")
         }
@@ -89,6 +96,10 @@ fun WebsiteScreen(url: String) {
             myWebView.settings.javaScriptEnabled = true
             myWebView.settings.domStorageEnabled = true
 
+            myWebView.isLongClickable = false
+            myWebView.setOnLongClickListener { true }
+            myWebView.isHapticFeedbackEnabled = false
+
             myWebView.webViewClient = object : WebViewClient() {
 
                 override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -100,6 +111,16 @@ fun WebsiteScreen(url: String) {
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     progressBar.visibility = View.GONE
+
+                    myWebView.loadUrl(
+                        "javascript:(function() {" +
+                                "document.documentElement.style.webkitUserSelect='none';" +
+                                "document.documentElement.style.userSelect='none';" +
+                                "document.documentElement.style.webkitTouchCallout='none';" +
+                                "document.documentElement.style.webkitTapHighlightColor='rgba(0,0,0,0)';" +
+                                "})();"
+                    )
+
                     super.onPageFinished(view, url)
                 }
 
